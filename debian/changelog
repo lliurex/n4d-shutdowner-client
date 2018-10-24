@@ -1,0 +1,29 @@
+n4d-shutdowner-client (0.3.2) xenial; urgency=high
+
+  * Making sure SHUTDOWN var is read at boot time.
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Fri, 14 Jul 2017 19:20:59 +0200
+
+n4d-shutdowner-client (0.3.1) xenial; urgency=high
+
+  * Moving startup to a thread
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Fri, 14 Jul 2017 15:00:30 +0200
+
+n4d-shutdowner-client (0.3) xenial; urgency=high
+
+  * Making sure cron file exists before trying to delete it. 
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Tue, 11 Jul 2017 11:47:17 +0200
+
+n4d-shutdowner-client (0.2) xenial; urgency=high
+
+  * Making sure n4d is ready to load plugin
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Wed, 05 Jul 2017 12:50:03 +0200
+
+n4d-shutdowner-client (0.1) xenial; urgency=high
+
+  * Initial release.
+
+ -- Hector Garcia Huerta <hectorgh@gmail.com>  Thu, 29 Jun 2017 14:00:50 +0200
