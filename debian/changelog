@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.3.13) bionic; urgency=medium
+
+  * Adding sudo group
+
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Thu, 14 Feb 2019 13:36:37 +0100
+
 n4d-shutdowner-client (0.3.12) bionic; urgency=medium
 
   * Initial release for bionic
