@@ -3,4 +3,4 @@ type=python
 path=ShutdownerClient.py
 class=ShutdownerClient
 [METHODS]
-shutdown = admin,admins,adm,teachers
+shutdown = admin,admins,sudo,teachers
