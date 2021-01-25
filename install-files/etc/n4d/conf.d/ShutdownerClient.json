@@ -1,0 +1,16 @@
+{
+	"SETUP":{
+		"type": "python",
+		"path": "ShutdownerClient.py",
+		"class": "ShutdownerClient"
+	},
+	"METHODS":
+	{
+		"shutdown":{
+			"allowed_groups": ["admins","admin","sudo","teachers"]
+		},
+		
+		
+		
+	}
+}	

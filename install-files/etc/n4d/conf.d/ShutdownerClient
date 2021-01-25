@@ -1,6 +1,0 @@
-[SETUP]
-type=python
-path=ShutdownerClient.py
-class=ShutdownerClient
-[METHODS]
-shutdown = admin,admins,sudo,teachers
