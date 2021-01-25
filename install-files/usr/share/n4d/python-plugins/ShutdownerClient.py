@@ -1,12 +1,17 @@
+#!/usr/bin/python3
 import os
 import threading
 import time
+import n4d.server.core as n4dcore
+import n4d.responses
+
 
 
 class ShutdownerClient:
 
 	def __init__(self):
 		
+		self.core=n4dcore.Core.get_core()
 		self.cron_file="/etc/cron.d/lliurex-shutdowner"
 
 	#def init
@@ -21,13 +26,17 @@ class ShutdownerClient:
 	
 	def _startup(self):
 		
-		objects["VariablesManager"].register_trigger("SHUTDOWNER","ShutdownerClient",self.shutdowner_trigger)
+		#Old n4d: objects["VariablesManager"].register_trigger("SHUTDOWNER","ShutdownerClient",self.shutdowner_trigger)
+		self.core.register_variable_trigger("SHUTDOWNER","ShutdownerClient",self.shutdowner_trigger)
+		
 		
 		# Making sure we're able to read SHUTDOWNER var from server
 		tries=10
 		for x in range(0,tries):
 		
-			self.shutdowner_var=objects["VariablesManager"].get_variable("SHUTDOWNER")
+			#Old n4d:self.shutdowner_var=objects["VariablesManager"].get_variable("SHUTDOWNER")
+			self.shutdowner_var=self.core.get_variable("SHUTDOWNER")["return"]
+			
 			if self.shutdowner_var != None:
 				self.shutdowner_trigger(self.shutdowner_var)
 				break
