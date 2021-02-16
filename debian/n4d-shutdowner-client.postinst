@@ -5,7 +5,7 @@ set -e
 case "$1" in
    configure)
 
-	n4d-modules enable-plugin /etc/n4d/conf.d/ShutdownerClient || true
+	n4d-modules enable-plugin /etc/n4d/conf.d/ShutdownerClient.json || true
 	
    ;;
 
