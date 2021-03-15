@@ -8,9 +8,7 @@
 	{
 		"shutdown":{
 			"allowed_groups": ["admins","admin","sudo","teachers"]
-		},
-		
-		
+		}
 		
 	}
 }	
