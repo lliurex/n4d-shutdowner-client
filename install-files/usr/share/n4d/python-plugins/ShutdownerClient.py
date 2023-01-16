@@ -13,6 +13,8 @@ class ShutdownerClient:
 		
 		self.core=n4dcore.Core.get_core()
 		self.cron_file="/etc/cron.d/lliurex-shutdowner"
+		self.override_folder="/etc/lliurex-shutdowner"
+		self.override_token=os.path.join(self.override_folder,"client-override.token")
 
 	#def init
 	
@@ -46,30 +48,112 @@ class ShutdownerClient:
 		if self.shutdowner_var == None:
 			self.shutdowner_var={}
 			self.shutdowner_var["shutdown_signal"]=0
-		
+
+
 	#def startup
 	
 	def shutdowner_trigger(self,value):
 		
-		if value!=None:
+		override=False
+		override_enabled=self._is_override_enabled()
 
-			if value["cron_enabled"]:
-				if value["cron_content"]!=None:
-					f=open(self.cron_file,"w")
-					f.write(value["cron_content"])
-					f.close()
+		if value!=None:
+			if not value["cron_values"]["server_shutdown"]:
+				if override_enabled:
+					override=True
+
+			if not override:
+				if value["cron_enabled"]:
+					if value["cron_content"]!=None:
+						self._create_cron_file(value)
+				else:
+					self._delete_cron_file()
+				
+				if value["shutdown_signal"] > self.shutdowner_var["shutdown_signal"]:
+					self.shutdown()
 			else:
-				if os.path.exists(self.cron_file):
-					os.remove(self.cron_file)
-			
-			if value["shutdown_signal"] > self.shutdowner_var["shutdown_signal"]:
-				self.shutdown()
+				self._delete_cron_file()
 		
-	#def server_trigger
-	
+	#def shutdowner_trigger
 	
 	def shutdown(self):
 		
 		os.system('shutdown -h now')
 		
-	#def shutdownlist
+	#def shutdown
+
+	def is_shutdown_override_enabled(self):
+
+		is_enabled=self._is_override_enabled()
+		return n4d.responses.build_successful_call_response(is_enabled)
+
+	#def is_shutdown_override_enabled
+
+	def enable_override_shutdown(self):
+
+		self._create_override_token()
+		self._delete_cron_file()
+		
+		return n4d.responses.build_successful_call_response()
+	
+	#def enable_override_shutdown
+
+	def disable_override_shutdown(self):
+
+		self._delete_override_token()
+		value=self.core.get_variable("SHUTDOWNER")["return"]
+
+		if value!=None:
+			if value["cron_enabled"]:
+				if value["cron_content"]!=None:
+					self._create_cron_file(value)
+
+		return n4d.responses.build_successful_call_response()
+
+	#def disable_override_shutdown
+
+	def _is_override_enabled(self):
+
+		if not os.path.exists(self.override_folder):
+			return False
+		else:
+			if os.path.exists(self.override_token):
+				return True
+			else:
+				return False
+
+	#def _is_override_enabled 
+
+	def _create_cron_file(self,value):
+
+		f=open(self.cron_file,"w")
+		f.write(value["cron_content"])
+		f.close()
+
+	#def _create_cron_file
+
+	def _delete_cron_file(self):
+
+		if os.path.exists(self.cron_file):
+			os.remove(self.cron_file)
+
+	#def _delete_cron_file
+
+	def _create_override_token(self):
+
+		if not os.path.exists(self.override_folder):
+			os.mkdir(self.override_folder)
+
+		if not os.path.exists(self.override_token):
+			f=open(self.override_token,'w')
+			f.close()
+
+	#def _create_override_token
+
+	def _delete_override_token(self):
+
+		if os.path.exists(self.override_token):
+			os.remove(self.override_token)
+
+	#def _delete_override_token
+

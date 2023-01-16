@@ -8,6 +8,18 @@
 	{
 		"shutdown":{
 			"allowed_groups": ["admins","admin","sudo","teachers"]
+		},
+
+		"is_shutdown_override_enabled":{
+			"allowed_groups": ["admins","admin","sudo","teachers"]
+		},
+
+		"enable_override_shutdown":{
+			"allowed_groups": ["admins","admin","sudo","teachers"]
+		},
+
+		"disable_override_shutdown":{
+			"allowed_groups": ["admins","admin","sudo","teachers"]
 		}
 		
 	}
