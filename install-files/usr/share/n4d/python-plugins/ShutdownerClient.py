@@ -91,11 +91,15 @@ class ShutdownerClient:
 
 	def enable_override_shutdown(self):
 
-		self._create_override_token()
-		self._delete_cron_file()
+		value=self.core.get_variable("SHUTDOWNER")["return"]
+		ret=False
+		if not value["cron_values"]["server_shutdown"]:
+			self._create_override_token()
+			self._delete_cron_file()
+			ret=True
 		
-		return n4d.responses.build_successful_call_response()
-	
+		return n4d.responses.build_successful_call_response(ret)
+
 	#def enable_override_shutdown
 
 	def disable_override_shutdown(self):
