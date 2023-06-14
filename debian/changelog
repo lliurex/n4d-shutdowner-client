@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.4.15) focal; urgency=medium
+
+  * Added option to override shutdown.
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Wed, 14 Jun 2023 17:21:38 +0200
+
 n4d-shutdowner-client (0.4.14) focal; urgency=medium
 
   * Fixed conf file
