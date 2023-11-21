@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.14.15) jammy; urgency=medium
+
+  * Initial release for Jammy
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Tue, 21 Nov 2023 14:29:06 +0100
+
 n4d-shutdowner-client (0.4.15) focal; urgency=medium
 
   * Added option to override shutdown.
