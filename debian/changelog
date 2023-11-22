@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.4.16) focal; urgency=medium
+
+  * Fixed performance in clientized desktops
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Wed, 22 Nov 2023 15:31:58 +0100
+
 n4d-shutdowner-client (0.4.15) focal; urgency=medium
 
   * Added option to override shutdown.
