@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 import os
+import subprocess
 import threading
 import time
 import n4d.server.core as n4dcore
 import n4d.responses
-
-
+import xmlrpc.client as n4dclient
+import ssl
 
 class ShutdownerClient:
 
@@ -13,6 +14,7 @@ class ShutdownerClient:
 		
 		self.core=n4dcore.Core.get_core()
 		self.cron_file="/etc/cron.d/lliurex-shutdowner"
+		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-thinclients"
 		self.override_folder="/etc/lliurex-shutdowner"
 		self.override_token=os.path.join(self.override_folder,"client-override.token")
 
@@ -20,9 +22,13 @@ class ShutdownerClient:
 	
 	def startup(self,options):
 		
-		t=threading.Thread(target=self._startup)
-		t.daemon=True
-		t.start()
+		if self._is_client_mode():
+			if os.path.exists(self.desktop_cron_file):
+				os.remove(self.desktop_cron_file)
+			t=threading.Thread(target=self._startup)
+			t.daemon=True
+			t.start()
+		
 		
 	#def startup
 	
@@ -160,4 +166,52 @@ class ShutdownerClient:
 			os.remove(self.override_token)
 
 	#def _delete_override_token
+	
+	def _is_client_mode(self):
+
+		isClient=False
+		isDesktop=False
+	
+		try:
+			cmd='lliurex-version -v'
+			p=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
+			result=p.communicate()[0]
+
+			if type(result) is bytes:
+				result=result.decode()
+
+			flavours = [ x.strip() for x in result.split(',') ]
+
+			for item in flavours:
+				if 'server' in item:
+					isClient=False
+					break
+				elif 'client' in item:
+					isClient=True
+				elif 'desktop' in item:
+					isDesktop=True
+			
+			if isClient:
+				if isDesktop:
+					if not self._check_connection_with_server():
+						isClient=False
+			
+			return isClient
+			
+		except Exception as e:
+			return False
+	
+	#def _is_client_mode
+
+	def _check_connection_with_server(self):
+
+		try:
+			context=ssl._create_unverified_context()
+			client=n4dclient.ServerProxy('https://server:9779',context=context,allow_none=True)
+			test=client.is_cron_enabled('','ShutdownerManager')
+			return True
+		except Exception as e:
+			return False
+
+	#def _check_connection_with_server
 
