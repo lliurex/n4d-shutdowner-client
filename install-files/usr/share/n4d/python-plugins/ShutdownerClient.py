@@ -14,7 +14,7 @@ class ShutdownerClient:
 		
 		self.core=n4dcore.Core.get_core()
 		self.cron_file="/etc/cron.d/lliurex-shutdowner"
-		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-thinclients"
+		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-desktop"
 		self.override_folder="/etc/lliurex-shutdowner"
 		self.override_token=os.path.join(self.override_folder,"client-override.token")
 
@@ -170,7 +170,7 @@ class ShutdownerClient:
 	def _is_client_mode(self):
 
 		isClient=False
-		isDesktop=False
+		isDesktop=True
 	
 		try:
 			cmd='lliurex-version -v'
@@ -183,18 +183,13 @@ class ShutdownerClient:
 			flavours = [ x.strip() for x in result.split(',') ]
 
 			for item in flavours:
-				if 'server' in item:
-					isClient=False
+				if 'adi' in item:
+					isDesktop=False
 					break
-				elif 'client' in item:
+
+			if isDesktop:
+				if self._check_connection_with_adi():
 					isClient=True
-				elif 'desktop' in item:
-					isDesktop=True
-			
-			if isClient:
-				if isDesktop:
-					if not self._check_connection_with_server():
-						isClient=False
 			
 			return isClient
 			
@@ -203,7 +198,7 @@ class ShutdownerClient:
 	
 	#def _is_client_mode
 
-	def _check_connection_with_server(self):
+	def _check_connection_with_adi(self):
 
 		try:
 			context=ssl._create_unverified_context()
@@ -213,5 +208,5 @@ class ShutdownerClient:
 		except Exception as e:
 			return False
 
-	#def _check_connection_with_server
+	#def _check_connection_with_adi
 
