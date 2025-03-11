@@ -17,6 +17,7 @@ class ShutdownerClient:
 		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-thinclients"
 		self.override_folder="/etc/lliurex-shutdowner"
 		self.override_token=os.path.join(self.override_folder,"client-override.token")
+		self.adiClient="/usr/bin/natfree-client"
 
 	#def init
 	
@@ -71,6 +72,7 @@ class ShutdownerClient:
 			if not override:
 				if value["cron_enabled"]:
 					if value["cron_content"]!=None:
+						value["cron_content"]=value["cron_content"].replace("&gt;&gt;",">>")
 						self._create_cron_file(value)
 				else:
 					self._delete_cron_file()
@@ -116,6 +118,8 @@ class ShutdownerClient:
 		if value!=None:
 			if value["cron_enabled"]:
 				if value["cron_content"]!=None:
+					value["cron_content"]=value["cron_content"].replace("&gt;&gt;",">>")
+
 					self._create_cron_file(value)
 
 		return n4d.responses.build_successful_call_response()
@@ -190,6 +194,8 @@ class ShutdownerClient:
 					isClient=True
 				elif 'desktop' in item:
 					isDesktop=True
+					if os.path.exists(self.adiClient):
+						isClient=True
 			
 			if isClient:
 				if isDesktop:
