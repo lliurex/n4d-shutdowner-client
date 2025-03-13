@@ -14,10 +14,12 @@ class ShutdownerClient:
 		
 		self.core=n4dcore.Core.get_core()
 		self.cron_file="/etc/cron.d/lliurex-shutdowner"
-		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-thinclients"
+		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-desktop"
 		self.override_folder="/etc/lliurex-shutdowner"
 		self.override_token=os.path.join(self.override_folder,"client-override.token")
-
+		self.adi_client="/usr/bin/natfree-client"
+		self.version_reference=["adi","desktop"]
+	
 	#def init
 	
 	def startup(self,options):
@@ -29,20 +31,16 @@ class ShutdownerClient:
 			t.daemon=True
 			t.start()
 		
-		
 	#def startup
 	
 	def _startup(self):
 		
-		#Old n4d: objects["VariablesManager"].register_trigger("SHUTDOWNER","ShutdownerClient",self.shutdowner_trigger)
 		self.core.register_variable_trigger("SHUTDOWNER","ShutdownerClient",self.shutdowner_trigger)
-		
 		
 		# Making sure we're able to read SHUTDOWNER var from server
 		tries=10
 		for x in range(0,tries):
 		
-			#Old n4d:self.shutdowner_var=objects["VariablesManager"].get_variable("SHUTDOWNER")
 			self.shutdowner_var=self.core.get_variable("SHUTDOWNER")["return"]
 			
 			if self.shutdowner_var != None:
@@ -54,7 +52,6 @@ class ShutdownerClient:
 		if self.shutdowner_var == None:
 			self.shutdowner_var={}
 			self.shutdowner_var["shutdown_signal"]=0
-
 
 	#def startup
 	
@@ -169,8 +166,9 @@ class ShutdownerClient:
 	
 	def _is_client_mode(self):
 
-		isClient=False
-		isDesktop=False
+		is_client=False
+		is_desktop=True
+		flavours=[]
 	
 		try:
 			cmd='lliurex-version -v'
@@ -180,30 +178,28 @@ class ShutdownerClient:
 			if type(result) is bytes:
 				result=result.decode()
 
-			flavours = [ x.strip() for x in result.split(',') ]
+			for x in result.split(","):
+				if x.strip() in self.version_reference:
+					flavours.append(x.strip())
 
 			for item in flavours:
-				if 'server' in item:
-					isClient=False
+				if 'adi' in item:
+					is_desktop=False
 					break
-				elif 'client' in item:
-					isClient=True
-				elif 'desktop' in item:
-					isDesktop=True
+							
+			if is_desktop:
+				if os.path.exists(self.adi_client):
+					if self._check_connection_with_adi():
+						is_client=True
 			
-			if isClient:
-				if isDesktop:
-					if not self._check_connection_with_server():
-						isClient=False
-			
-			return isClient
+			return is_client
 			
 		except Exception as e:
 			return False
 	
 	#def _is_client_mode
 
-	def _check_connection_with_server(self):
+	def _check_connection_with_adi(self):
 
 		try:
 			context=ssl._create_unverified_context()
@@ -213,5 +209,7 @@ class ShutdownerClient:
 		except Exception as e:
 			return False
 
-	#def _check_connection_with_server
+	#def _check_connection_with_adi
+
+#class ShutdownerClient
 
