@@ -57,15 +57,15 @@ class ShutdownerClient:
 	
 	def shutdowner_trigger(self,value):
 		
-		override=False
+		override_shut=False
 		override_enabled=self._is_override_enabled()
 
 		if value!=None:
 			if not value["cron_values"]["server_shutdown"]:
 				if override_enabled:
-					override=True
+					override_shut=True
 
-			if not override:
+			if not override_shut:
 				if value["cron_enabled"]:
 					if value["cron_content"]!=None:
 						self._create_cron_file(value)
@@ -88,6 +88,7 @@ class ShutdownerClient:
 	def is_shutdown_override_enabled(self):
 
 		is_enabled=self._is_override_enabled()
+		
 		return n4d.responses.build_successful_call_response(is_enabled)
 
 	#def is_shutdown_override_enabled
