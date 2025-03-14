@@ -15,8 +15,8 @@ class ShutdownerClient:
 		self.core=n4dcore.Core.get_core()
 		self.cron_file="/etc/cron.d/lliurex-shutdowner"
 		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-thinclients"
-		self.override_shutdown_folder="/etc/lliurex-shutdowner"
-		self.override_shutdown_token=os.path.join(self.override_shutdown_folder,"client-override_shutdown.token")
+		self.override_folder="/etc/lliurex-shutdowner"
+		self.override_token=os.path.join(self.override_folder,"client-override.token")
 		self.adi_client="/usr/bin/natfree-client"
 
 	#def init
@@ -56,15 +56,15 @@ class ShutdownerClient:
 	
 	def shutdowner_trigger(self,value):
 		
-		override_shutdown=False
-		override_shutdown_enabled=self._is_override_shutdown_enabled()
+		override_shut=False
+		override_enabled=self._is_override_enabled()
 
 		if value!=None:
 			if not value["cron_values"]["server_shutdown"]:
-				if override_shutdown_enabled:
-					override_shutdown=True
+				if override_enabled:
+					override_shut=True
 
-			if not override_shutdown:
+			if not override_shut:
 				if value["cron_enabled"]:
 					if value["cron_content"]!=None:
 						value["cron_content"]=value["cron_content"].replace("&gt;&gt;",">>")
@@ -85,30 +85,30 @@ class ShutdownerClient:
 		
 	#def shutdown
 
-	def is_shutdown_override_shutdown_enabled(self):
+	def is_shutdown_override_enabled(self):
 
-		is_enabled=self._is_override_shutdown_enabled()
+		is_enabled=self._is_override_enabled()
 		
 		return n4d.responses.build_successful_call_response(is_enabled)
 
-	#def is_shutdown_override_shutdown_enabled
+	#def is_shutdown_override_enabled
 
-	def enable_override_shutdown_shutdown(self):
+	def enable_override_shutdown(self):
 
 		value=self.core.get_variable("SHUTDOWNER")["return"]
 		ret=False
 		if not value["cron_values"]["server_shutdown"]:
-			self._create_override_shutdown_token()
+			self._create_override_token()
 			self._delete_cron_file()
 			ret=True
 		
 		return n4d.responses.build_successful_call_response(ret)
 
-	#def enable_override_shutdown_shutdown
+	#def enable_override_shutdown
 
-	def disable_override_shutdown_shutdown(self):
+	def disable_override_shutdown(self):
 
-		self._delete_override_shutdown_token()
+		self._delete_override_token()
 		value=self.core.get_variable("SHUTDOWNER")["return"]
 
 		if value!=None:
@@ -120,19 +120,19 @@ class ShutdownerClient:
 
 		return n4d.responses.build_successful_call_response()
 
-	#def disable_override_shutdown_shutdown
+	#def disable_override_shutdown
 
-	def _is_override_shutdown_enabled(self):
+	def _is_override_enabled(self):
 
-		if not os.path.exists(self.override_shutdown_folder):
+		if not os.path.exists(self.override_folder):
 			return False
 		else:
-			if os.path.exists(self.override_shutdown_token):
+			if os.path.exists(self.override_token):
 				return True
 			else:
 				return False
 
-	#def _is_override_shutdown_enabled 
+	#def _is_override_enabled 
 
 	def _create_cron_file(self,value):
 
@@ -149,23 +149,23 @@ class ShutdownerClient:
 
 	#def _delete_cron_file
 
-	def _create_override_shutdown_token(self):
+	def _create_override_token(self):
 
-		if not os.path.exists(self.override_shutdown_folder):
-			os.mkdir(self.override_shutdown_folder)
+		if not os.path.exists(self.override_folder):
+			os.mkdir(self.override_folder)
 
-		if not os.path.exists(self.override_shutdown_token):
-			f=open(self.override_shutdown_token,'w')
+		if not os.path.exists(self.override_token):
+			f=open(self.override_token,'w')
 			f.close()
 
-	#def _create_override_shutdown_token
+	#def _create_override_token
 
-	def _delete_override_shutdown_token(self):
+	def _delete_override_token(self):
 
-		if os.path.exists(self.override_shutdown_token):
-			os.remove(self.override_shutdown_token)
+		if os.path.exists(self.override_token):
+			os.remove(self.override_token)
 
-	#def _delete_override_shutdown_token
+	#def _delete_override_token
 	
 	def _is_client_mode(self):
 
