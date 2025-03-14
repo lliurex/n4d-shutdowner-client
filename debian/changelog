@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.14.17.1) jammy-testing; urgency=medium
+
+  * Clean code
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Fri, 14 Mar 2025 09:15:13 +0100
+
 n4d-shutdowner-client (0.14.17) jammy-testing; urgency=medium
 
   * Supported new classroom model
