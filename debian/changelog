@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.24.17) noble; urgency=medium
+
+  * Clean code
+
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Fri, 14 Mar 2025 11:09:07 +0100
+
 n4d-shutdowner-client (0.24.16) noble; urgency=medium
 
   * Initial release for Noble
