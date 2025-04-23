@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.14.17.3) jammy-testing; urgency=medium
+
+  * Fixed performance in new model
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Wed, 23 Apr 2025 14:08:58 +0200
+
 n4d-shutdowner-client (0.14.17.2) jammy-testing; urgency=medium
 
   * Fixed minor bug.
