@@ -7,6 +7,7 @@ import n4d.server.core as n4dcore
 import n4d.responses
 import xmlrpc.client as n4dclient
 import ssl
+import re
 
 class ShutdownerClient:
 
@@ -36,6 +37,7 @@ class ShutdownerClient:
 		if self._is_client_mode():
 			remove_cron=True
 			if self.is_desktop:
+				'''
 				max_retry=602
 				count=0
 				while True:
@@ -46,7 +48,36 @@ class ShutdownerClient:
 				
 				if not self._check_connection_with_server():
 					remove_cron=False
-			
+				'''
+				while True:
+					init_session=self._check_open_session()
+					if init_session:
+						break
+					time.sleep(65)
+
+				max_retry=5
+				time_to_check=120
+				time_count=0
+				count_retry=0
+				time.sleep(2)
+
+				while True:
+					if time_count>=time_to_check:
+						remove_cron=self._check_connection_with_server()
+						if remove_cron:
+							break
+						else:
+							if count_retry<max_retry:
+								count_retry+=1
+								time_count=0
+							else:
+								break
+					else:	
+						time_count+=1
+				
+					time.sleep(1)
+
+
 			if remove_cron:
 				if os.path.exists(self.desktop_cron_file):
 					os.remove(self.desktop_cron_file)
@@ -231,5 +262,26 @@ class ShutdownerClient:
 			return False
 
 	#def _check_connection_with_server
+
+	def _check_open_session(self):
+
+		res = subprocess.run([ "loginctl", "--no-legend", "list-sessions" ],stdout=subprocess.PIPE)
+
+		for line in res.stdout.decode().split("\n"):
+			if len(line)>0:
+				session, uid, user, rest = re.split( r"\s+", line, maxsplit=3 )
+				if user!="sddm":
+					info = subprocess.run([ "loginctl", "show-session", session ],stdout=subprocess.PIPE)
+					data={}
+					for infoline in info.stdout.decode().split("\n"):
+						if len(infoline)>0:
+							key, value = re.split( "=", infoline, maxsplit=1 )
+							data[key] = value
+							if data.get("Active")=="yes" and (data.get("Type")=="x11" or data.get("Type")=="wayland"):
+								return True
+		return False
+
+	#def _check_open_session
+	
 
 #class ShutdownerClient
