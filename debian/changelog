@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.14.17.4) jammy-testing; urgency=medium
+
+  * Wait until session starts
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Wed, 14 May 2025 16:36:45 +0200
+
 n4d-shutdowner-client (0.14.17.3) jammy-testing; urgency=medium
 
   * Fixed performance in new model
