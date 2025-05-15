@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.24.19) noble; urgency=medium
+
+  * Improved process to detect connection with ADI
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Thu, 15 May 2025 09:09:29 +0200
+
 n4d-shutdowner-client (0.24.18) noble; urgency=medium
 
   * Fixed plugin
