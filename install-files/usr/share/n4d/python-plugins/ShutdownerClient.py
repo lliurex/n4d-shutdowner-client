@@ -58,7 +58,7 @@ class ShutdownerClient:
 				max_retry=5
 				time_to_check=120
 				time_count=0
-				count_retry=0
+				count_retry=1
 				time.sleep(2)
 
 				while True:
