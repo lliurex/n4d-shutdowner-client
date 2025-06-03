@@ -18,7 +18,7 @@ class ShutdownerClient:
 		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-desktop"
 		self.override_shutdown_folder="/etc/lliurex-shutdowner"
 		self.override_shutdown_token=os.path.join(self.override_shutdown_folder,"client-override_shutdown.token")
-		self.adi_client="/usr/bin/natfree-client"
+		self.adi_client="/usr/bin/natfree-tie"
 		self.version_reference=["adi","desktop"]
 	
 	#def init
