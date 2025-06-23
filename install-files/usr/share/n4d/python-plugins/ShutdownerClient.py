@@ -11,6 +11,8 @@ import re
 
 class ShutdownerClient:
 
+	NATFREE_STARTUP=True
+
 	def __init__(self):
 		
 		self.core=n4dcore.Core.get_core()
@@ -37,26 +39,9 @@ class ShutdownerClient:
 		if self._is_client_mode():
 			remove_cron=True
 			if self.is_desktop:
-				'''
-				max_retry=602
-				count=0
-				while True:
-					if count>=max_retry:
-						break
-					count+=1
-					time.sleep(1)
 				
-				if not self._check_connection_with_server():
-					remove_cron=False
-				'''
-				while True:
-					init_session=self._check_open_session()
-					if init_session:
-						break
-					time.sleep(65)
-
-				max_retry=5
-				time_to_check=120
+				max_retry=10
+				time_to_check=1
 				time_count=0
 				count_retry=1
 				time.sleep(2)
@@ -262,26 +247,5 @@ class ShutdownerClient:
 			return False
 
 	#def _check_connection_with_server
-
-	def _check_open_session(self):
-
-		res = subprocess.run([ "loginctl", "--no-legend", "list-sessions" ],stdout=subprocess.PIPE)
-
-		for line in res.stdout.decode().split("\n"):
-			if len(line)>0:
-				session, uid, user, rest = re.split( r"\s+", line, maxsplit=3 )
-				if user!="sddm":
-					info = subprocess.run([ "loginctl", "show-session", session ],stdout=subprocess.PIPE)
-					data={}
-					for infoline in info.stdout.decode().split("\n"):
-						if len(infoline)>0:
-							key, value = re.split( "=", infoline, maxsplit=1 )
-							data[key] = value
-							if data.get("Active")=="yes" and (data.get("Type")=="x11" or data.get("Type")=="wayland"):
-								return True
-		return False
-
-	#def _check_open_session
-	
 
 #class ShutdownerClient
