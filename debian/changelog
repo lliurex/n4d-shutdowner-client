@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.14.17.7) jammy-testing; urgency=medium
+
+  * Changed to exec startup when connection with server is detected
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Mon, 23 Jun 2025 09:42:09 +0200
+
 n4d-shutdowner-client (0.14.17.6) jammy-testing; urgency=medium
 
   * Replaced natfree-references

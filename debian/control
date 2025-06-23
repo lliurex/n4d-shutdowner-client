@@ -9,7 +9,7 @@ Standards-Version: 4.1.2
 Package: n4d-shutdowner-client
 Architecture: all
 Pre-Depends: n4d (>= 0.112)
-Depends: ${misc:Depends}, lliurex-shutdowner-common
+Depends: ${misc:Depends}, lliurex-shutdowner-common,sync-on-server-ready,n4d-clientvars
 Description: LliureX Shutdowner Client plugin
  Plugin allowing lliurex-shutdowner to shutdown clients
 
