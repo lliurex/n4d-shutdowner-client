@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.14.17) jammy; urgency=medium
+
+  * Changed to support new model
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Wed, 23 Jul 2025 10:25:23 +0200
+
 n4d-shutdowner-client (0.14.16) jammy; urgency=medium
 
   * Fixed performance in clientized desktop
