@@ -7,44 +7,76 @@ import n4d.server.core as n4dcore
 import n4d.responses
 import xmlrpc.client as n4dclient
 import ssl
+import re
 
 class ShutdownerClient:
+
+	NATFREE_STARTUP=True
 
 	def __init__(self):
 		
 		self.core=n4dcore.Core.get_core()
 		self.cron_file="/etc/cron.d/lliurex-shutdowner"
 		self.desktop_cron_file="/etc/cron.d/lliurex-shutdowner-thinclients"
-		self.override_folder="/etc/lliurex-shutdowner"
-		self.override_token=os.path.join(self.override_folder,"client-override.token")
+		self.override_shutdown_folder="/etc/lliurex-shutdowner"
+		self.override_shutdown_token=os.path.join(self.override_shutdown_folder,"client-override_shutdown.token")
+		self.adi_client="/usr/bin/natfree-tie"
+		self.adi_server="/usr/bin/natfree-adi"
+		self.is_desktop=False
 
 	#def init
 	
 	def startup(self,options):
 		
-		if self._is_client_mode():
-			if os.path.exists(self.desktop_cron_file):
-				os.remove(self.desktop_cron_file)
-			t=threading.Thread(target=self._startup)
-			t.daemon=True
-			t.start()
-		
+		t=threading.Thread(target=self._check_connection)
+		t.daemon=True
+		t.start()
 		
 	#def startup
 	
+	def _check_connection(self):
+		
+		if self._is_client_mode():
+			remove_cron=True
+			if self.is_desktop:
+				
+				max_retry=10
+				time_to_check=1
+				time_count=0
+				count_retry=1
+				time.sleep(2)
+
+				while True:
+					if time_count>=time_to_check:
+						remove_cron=self._check_connection_with_server()
+						if remove_cron:
+							break
+						else:
+							if count_retry<max_retry:
+								count_retry+=1
+								time_count=0
+							else:
+								break
+					else:	
+						time_count+=1
+				
+					time.sleep(1)
+
+
+			if remove_cron:
+				if os.path.exists(self.desktop_cron_file):
+					os.remove(self.desktop_cron_file)
+			
+				self._startup()
+		
 	def _startup(self):
 		
-		#Old n4d: objects["VariablesManager"].register_trigger("SHUTDOWNER","ShutdownerClient",self.shutdowner_trigger)
 		self.core.register_variable_trigger("SHUTDOWNER","ShutdownerClient",self.shutdowner_trigger)
-		
 		
 		# Making sure we're able to read SHUTDOWNER var from server
 		tries=10
 		for x in range(0,tries):
-		
-			#Old n4d:self.shutdowner_var=objects["VariablesManager"].get_variable("SHUTDOWNER")
 			self.shutdowner_var=self.core.get_variable("SHUTDOWNER")["return"]
-			
 			if self.shutdowner_var != None:
 				self.shutdowner_trigger(self.shutdowner_var)
 				break
@@ -55,22 +87,22 @@ class ShutdownerClient:
 			self.shutdowner_var={}
 			self.shutdowner_var["shutdown_signal"]=0
 
-
 	#def startup
 	
 	def shutdowner_trigger(self,value):
 		
-		override=False
-		override_enabled=self._is_override_enabled()
+		override_shutdown=False
+		override_shutdown_enabled=self._is_override_shutdown_enabled()
 
 		if value!=None:
 			if not value["cron_values"]["server_shutdown"]:
-				if override_enabled:
-					override=True
+				if override_shutdown_enabled:
+					override_shutdown=True
 
-			if not override:
+			if not override_shutdown:
 				if value["cron_enabled"]:
 					if value["cron_content"]!=None:
+						value["cron_content"]=value["cron_content"].replace("&gt;&gt;",">>")
 						self._create_cron_file(value)
 				else:
 					self._delete_cron_file()
@@ -90,7 +122,8 @@ class ShutdownerClient:
 
 	def is_shutdown_override_enabled(self):
 
-		is_enabled=self._is_override_enabled()
+		is_enabled=self._is_override_shutdown_enabled()
+		
 		return n4d.responses.build_successful_call_response(is_enabled)
 
 	#def is_shutdown_override_enabled
@@ -100,7 +133,7 @@ class ShutdownerClient:
 		value=self.core.get_variable("SHUTDOWNER")["return"]
 		ret=False
 		if not value["cron_values"]["server_shutdown"]:
-			self._create_override_token()
+			self._create_override_shutdown_token()
 			self._delete_cron_file()
 			ret=True
 		
@@ -110,29 +143,31 @@ class ShutdownerClient:
 
 	def disable_override_shutdown(self):
 
-		self._delete_override_token()
+		self._delete_override_shutdown_token()
 		value=self.core.get_variable("SHUTDOWNER")["return"]
 
 		if value!=None:
 			if value["cron_enabled"]:
 				if value["cron_content"]!=None:
+					value["cron_content"]=value["cron_content"].replace("&gt;&gt;",">>")
+
 					self._create_cron_file(value)
 
 		return n4d.responses.build_successful_call_response()
 
 	#def disable_override_shutdown
 
-	def _is_override_enabled(self):
+	def _is_override_shutdown_enabled(self):
 
-		if not os.path.exists(self.override_folder):
+		if not os.path.exists(self.override_shutdown_folder):
 			return False
 		else:
-			if os.path.exists(self.override_token):
+			if os.path.exists(self.override_shutdown_token):
 				return True
 			else:
 				return False
 
-	#def _is_override_enabled 
+	#def _is_override_shutdown_enabled 
 
 	def _create_cron_file(self,value):
 
@@ -149,28 +184,28 @@ class ShutdownerClient:
 
 	#def _delete_cron_file
 
-	def _create_override_token(self):
+	def _create_override_shutdown_token(self):
 
-		if not os.path.exists(self.override_folder):
-			os.mkdir(self.override_folder)
+		if not os.path.exists(self.override_shutdown_folder):
+			os.mkdir(self.override_shutdown_folder)
 
-		if not os.path.exists(self.override_token):
-			f=open(self.override_token,'w')
+		if not os.path.exists(self.override_shutdown_token):
+			f=open(self.override_shutdown_token,'w')
 			f.close()
 
-	#def _create_override_token
+	#def _create_override_shutdown_token
 
-	def _delete_override_token(self):
+	def _delete_override_shutdown_token(self):
 
-		if os.path.exists(self.override_token):
-			os.remove(self.override_token)
+		if os.path.exists(self.override_shutdown_token):
+			os.remove(self.override_shutdown_token)
 
-	#def _delete_override_token
+	#def _delete_override_shutdown_token
 	
 	def _is_client_mode(self):
 
-		isClient=False
-		isDesktop=False
+		is_client=False
+		self.is_desktop=False
 	
 		try:
 			cmd='lliurex-version -v'
@@ -184,19 +219,17 @@ class ShutdownerClient:
 
 			for item in flavours:
 				if 'server' in item:
-					isClient=False
+					is_client=False
 					break
 				elif 'client' in item:
-					isClient=True
+					is_client=True
 				elif 'desktop' in item:
-					isDesktop=True
-			
-			if isClient:
-				if isDesktop:
-					if not self._check_connection_with_server():
-						isClient=False
-			
-			return isClient
+					self.is_desktop=True
+					if not os.path.exists(self.adi_server):
+						if os.path.exists(self.adi_client):
+							is_client=True
+
+			return is_client
 			
 		except Exception as e:
 			return False
@@ -215,3 +248,4 @@ class ShutdownerClient:
 
 	#def _check_connection_with_server
 
+#class ShutdownerClient
