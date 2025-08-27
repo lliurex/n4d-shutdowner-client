@@ -11,6 +11,8 @@ import re
 
 class ShutdownerClient:
 
+	NATFREE_STARTUP=True
+
 	def __init__(self):
 		
 		self.core=n4dcore.Core.get_core()
@@ -19,8 +21,9 @@ class ShutdownerClient:
 		self.override_shutdown_folder="/etc/lliurex-shutdowner"
 		self.override_shutdown_token=os.path.join(self.override_shutdown_folder,"client-override_shutdown.token")
 		self.adi_client="/usr/bin/natfree-tie"
+		self.adi_server="/usr/bin/natfree-adi"
 		self.version_reference=["adi","desktop"]
-	
+
 	#def init
 
 	def startup(self,options):
@@ -35,32 +38,13 @@ class ShutdownerClient:
 		
 		if self._is_client_mode():
 			remove_cron=True
-			'''
-			max_retry=602
-			count=0
-			while True:
-				if count>=max_retry:
-					break
-				count+=1
-				time.sleep(1)
-				
-			if not self._check_connection_with_adi():
-				remove_cron=False
-			'''
-			while True:
-				init_session=self._check_open_session()
-				if init_session:
-					break
-				time.sleep(65)
-
-			max_retry=5
-			time_to_check=120
+			max_retry=10
+			time_to_check=1
 			time_count=0
 			count_retry=1
 			time.sleep(2)
 
 			while True:
-				
 				if time_count>=time_to_check:
 					remove_cron=self._check_connection_with_adi()
 					if remove_cron:
@@ -219,9 +203,14 @@ class ShutdownerClient:
 	def _is_client_mode(self):
 
 		is_client=False
-		is_desktop=True
+		
+		if not os.path.exists(self.adi_server):
+			if os.path.exists(self.adi_client):
+				is_client=True
+
+		return is_client
+		'''
 		flavours=[]
-	
 		try:
 			cmd='lliurex-version -v'
 			p=subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE)
@@ -247,7 +236,7 @@ class ShutdownerClient:
 			
 		except Exception as e:
 			return False
-	
+		'''
 	#def _is_client_mode
 
 	def _check_connection_with_adi(self):
@@ -261,27 +250,6 @@ class ShutdownerClient:
 			return False
 
 	#def _check_connection_with_adi
-
-	def _check_open_session(self):
-
-		res = subprocess.run([ "loginctl", "--no-legend", "list-sessions" ],stdout=subprocess.PIPE)
-
-		for line in res.stdout.decode().split("\n"):
-			if len(line)>0:
-				session, uid, user, rest = re.split( r"\s+", line, maxsplit=3 )
-				if user!="sddm":
-					info = subprocess.run([ "loginctl", "show-session", session ],stdout=subprocess.PIPE)
-					data={}
-					for infoline in info.stdout.decode().split("\n"):
-						if len(infoline)>0:
-							key, value = re.split( "=", infoline, maxsplit=1 )
-							data[key] = value
-							if data.get("Active")=="yes" and (data.get("Type")=="x11" or data.get("Type")=="wayland"):
-								return True
-		return False
-
-	#def _check_open_session
-
 
 #class ShutdownerClient
 
