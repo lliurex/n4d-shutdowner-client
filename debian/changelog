@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.24.21) noble; urgency=medium
+
+  * Changed detection of ADI
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Wed, 27 Aug 2025 13:31:10 +0200
+
 n4d-shutdowner-client (0.24.20) noble; urgency=medium
 
   * Replaced natfree references
