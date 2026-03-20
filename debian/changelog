@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.14.18) jammy; urgency=medium
+
+  * Added timeout when check connection with server
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Fri, 20 Mar 2026 10:57:38 +0100
+
 n4d-shutdowner-client (0.14.17) jammy; urgency=medium
 
   * Changed to support new model
