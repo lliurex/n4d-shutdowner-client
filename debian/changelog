@@ -1,3 +1,9 @@
+n4d-shutdowner-client (0.24.22) noble; urgency=medium
+
+  * Added timeout when check connection with server
+  
+ -- Juan Ramon Pelegrina <juapesai@hotmail.com>  Fri, 20 Mar 2026 10:54:34 +0100
+
 n4d-shutdowner-client (0.24.21) noble; urgency=medium
 
   * Changed detection of ADI
