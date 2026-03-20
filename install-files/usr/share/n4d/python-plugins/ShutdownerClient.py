@@ -243,7 +243,6 @@ class ShutdownerClient:
 		try:
 			client=n4d.client.Client('https://server:9779',timeout=10)
 			test=client.ShutdownerManager.is_cron_enabled()
-			self.is_clientized_desktop=False
 			return True
 		except Exception as e:
 			return False
